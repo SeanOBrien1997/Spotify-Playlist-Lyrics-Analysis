@@ -1,0 +1,16 @@
+version: '3.7'
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: base
+    volumes:
+    - ./src:/usr/src/app
+    container_name: client
+    expose:
+    - '8083'
+    ports:
+    - '8083:8083'
+    command: npm run start

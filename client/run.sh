@@ -1,0 +1,1 @@
+docker run -it -p 3000:3000 -v ./client/src:/client/src client:latest
