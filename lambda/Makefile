@@ -1,4 +1,4 @@
-IMAGE_NAME='lamdba-nltk'
+IMAGE_NAME='lambda-nltk'
 IMAGE_PORT=9000
 LAMBDA_PAYLOAD='{"message": "Sample message payload"}'
 
