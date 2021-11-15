@@ -5,7 +5,11 @@ services:
     build: ./lambda
     ports:
       - 9000:8080
+    expose:
+      - 8080
     container_name: lambda-nltk
+    networks:
+      - local
   server:
     build:
       context: ./server
@@ -19,3 +23,8 @@ services:
     ports:
       - 5001:5001
     command: npm run dev
+    networks:
+      - local
+networks:
+  local:
+    driver: bridge
