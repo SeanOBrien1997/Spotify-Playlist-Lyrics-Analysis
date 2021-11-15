@@ -13,7 +13,7 @@ A Dockerised Python AWS Lambda function to perform sentiment analysis on event p
     $ brew install make
     ```
 
-# Script Guide
+# Script Guide for Lambda service
 
 ## Build
 - Used to build the Lambda function container. Will use `IMAGE_NAME` variable defined in the `Makefile` to tag the built image.
