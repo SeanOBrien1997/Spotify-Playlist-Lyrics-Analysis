@@ -2,7 +2,7 @@
 FROM public.ecr.aws/lambda/python:3.9
 
 # Copies Lambda function code
-COPY ./src/* ${LAMBDA_TASK_ROOT}
+COPY ./src/* ${LAMBDA_TASK_ROOT}/
 
 # Copies dependency information
 COPY requirements.txt .
