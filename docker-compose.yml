@@ -5,3 +5,17 @@ services:
     build: ./lambda
     ports:
       - 9000:8080
+    container_name: lambda-nltk
+  server:
+    build:
+      context: ./server
+      target: base
+    volumes:
+      - ./server/src:/home/node/app/src
+      - ./server/nodemon.json:/home/node/app/nodemon.json
+    container_name: server
+    expose:
+      - 5001
+    ports:
+      - 5001:5001
+    command: npm run dev
