@@ -10,6 +10,16 @@ services:
     container_name: lambda-nltk
     networks:
       - local
+  client:
+    build: ./client
+    ports: 
+      - 9001:3000
+    expose:
+      - 3000
+    container_name: spotify-client
+    networks:
+      - local
+    command: npm run start
   server:
     build:
       context: ./server
