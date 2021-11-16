@@ -28,69 +28,58 @@ Sending build context to Docker daemon  10.75kB
 Step 1/5 : FROM public.ecr.aws/lambda/python:3.9
  ---> 1391a5e36ae6
 Step 2/5 : COPY ./src/* ${LAMBDA_TASK_ROOT}/
+ ---> Using cache
  ---> 78111b1e679d
 Step 3/5 : COPY requirements.txt .
+ ---> Using cache
  ---> 19a08097dd7f
 Step 4/5 : RUN pip3 install -r requirements.txt --target "${LAMBDA_TASK_ROOT}"
- ---> Running in 2a0574add24b
-Collecting nltk==3.6.5
-  Downloading nltk-3.6.5-py3-none-any.whl (1.5 MB)
-Collecting click
-  Downloading click-8.0.3-py3-none-any.whl (97 kB)
-Collecting joblib
-  Downloading joblib-1.1.0-py2.py3-none-any.whl (306 kB)
-Collecting tqdm
-  Downloading tqdm-4.62.3-py2.py3-none-any.whl (76 kB)
-Collecting regex>=2021.8.3
-  Downloading regex-2021.11.10-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (763 kB)
-Installing collected packages: tqdm, regex, joblib, click, nltk
-Successfully installed click-8.0.3 joblib-1.1.0 nltk-3.6.5 regex-2021.11.10 tqdm-4.62.3
-WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
-WARNING: You are using pip version 21.1.3; however, version 21.3.1 is available.
-You should consider upgrading via the '/var/lang/bin/python3.9 -m pip install --upgrade pip' command.
-Removing intermediate container 2a0574add24b
+ ---> Using cache
  ---> 1b203d40573a
 Step 5/5 : CMD [ "app.handler" ]
- ---> Running in 20fe35bf4a3a
-Removing intermediate container 20fe35bf4a3a
+ ---> Using cache
  ---> 7f3c243bb1f2
 Successfully built 7f3c243bb1f2
 Successfully tagged spotify-playlist-lyrics-analysis_lambda-nltk:latest
+Building client
+Sending build context to Docker daemon  254.2MB
+Step 1/7 : FROM node:14
+ ---> 31421e72129c
+Step 2/7 : WORKDIR /usr/app/
+ ---> Using cache
+ ---> 46f9576033f1
+Step 3/7 : COPY package*.json ./
+ ---> Using cache
+ ---> 44a78db8901f
+Step 4/7 : RUN npm i
+ ---> Using cache
+ ---> 3562477b0c63
+Step 5/7 : COPY  public ./public/
+ ---> Using cache
+ ---> 4301d1cb2b11
+Step 6/7 : COPY src ./src/
+ ---> Using cache
+ ---> 87861e70beea
+Step 7/7 : COPY tsconfig*.json .
+ ---> Using cache
+ ---> 40e29e3e7df0
+Successfully built 40e29e3e7df0
+Successfully tagged spotify-playlist-lyrics-analysis_client:latest
 Building server
 Sending build context to Docker daemon     72MB
 Step 1/5 : FROM node:14 as base
  ---> 31421e72129c
 Step 2/5 : WORKDIR /home/node/app
- ---> Running in 0dc2ac002b35
-Removing intermediate container 0dc2ac002b35
+ ---> Using cache
  ---> 36229bf0e120
 Step 3/5 : COPY package*.json ./
+ ---> Using cache
  ---> 0f5b82d0d3ba
 Step 4/5 : RUN npm i
- ---> Running in d18743ecf89e
-npm WARN read-shrinkwrap This version of npm is compatible with lockfileVersion@1, but package-lock.json was generated for lockfileVersion@2. I'll try to do my best with it!
-
-> nodemon@2.0.14 postinstall /home/node/app/node_modules/nodemon
-> node bin/postinstall || exit 0
-
-Love nodemon? You can now support the project via the open collective:
- > https://opencollective.com/nodemon/donate
-
-npm WARN server@1.0.0 No description
-npm WARN server@1.0.0 No repository field.
-npm WARN optional SKIPPING OPTIONAL DEPENDENCY: fsevents@2.3.2 (node_modules/fsevents):
-npm WARN notsup SKIPPING OPTIONAL DEPENDENCY: Unsupported platform for fsevents@2.3.2: wanted {"os":"darwin","arch":"any"} (current: {"os":"linux","arch":"x64"})
-
-added 192 packages from 206 contributors and audited 193 packages in 2.364s
-
-16 packages are looking for funding
-  run `npm fund` for details
-
-found 0 vulnerabilities
-
-Removing intermediate container d18743ecf89e
+ ---> Using cache
  ---> 996bdfee576e
 Step 5/5 : COPY . .
+ ---> Using cache
  ---> 33e017f7b345
 Successfully built 33e017f7b345
 Successfully tagged spotify-playlist-lyrics-analysis_server:latest
@@ -106,14 +95,19 @@ Sample output will look similar to the following:
 ```shell
 $ make run
 docker-compose up
-Recreating lambda-nltk ... done
-Recreating server      ... done
-Attaching to lambda-nltk, server
-lambda-nltk    | time="2021-11-15T05:28:26.264" level=info msg="exec '/var/runtime/bootstrap' (cwd=/var/task, handler=)"
+Recreating spotify-client ... done
+Starting server           ... done
+Starting lambda-nltk      ... done
+Attaching to lambda-nltk, server, spotify-client
+lambda-nltk    | time="2021-11-16T22:06:19.165" level=info msg="exec '/var/runtime/bootstrap' (cwd=/var/task, handler=)"
 server         | 
 server         | > server@1.0.0 dev /home/node/app
 server         | > nodemon src/index.ts
 server         | 
+spotify-client | 
+spotify-client | > client@0.1.0 start /usr/app
+spotify-client | > react-scripts start
+spotify-client | 
 server         | [nodemon] 2.0.14
 server         | [nodemon] reading config ./nodemon.json
 server         | [nodemon] to restart at any time, enter `rs`
@@ -123,25 +117,31 @@ server         | [nodemon] watching extensions: ts,json
 server         | [nodemon] starting `node --inspect=0.0.0.0:9229 --nolazy -r ts-node/register src/index.ts`
 server         | [nodemon] spawning
 server         | [nodemon] child pid: 32
-server         | Debugger listening on ws://0.0.0.0:9229/7632900d-51c5-4eab-9b23-8bdae802879a
+server         | Debugger listening on ws://0.0.0.0:9229/c9b4a4f3-8f3f-4b42-9535-8091f7d0f117
 server         | For help, see: https://nodejs.org/en/docs/inspector
 server         | [nodemon] watching 2 files
 server         | Server running on port 5001
 server         | Sending request to: http://lambda-nltk:8080/2015-03-31/functions/function/invocations
-lambda-nltk    | time="2021-11-15T05:28:27.72" level=info msg="extensionsDisabledByLayer(/opt/disable-extensions-jwigqn8j) -> stat /opt/disable-extensions-jwigqn8j: no such file or directory"
-lambda-nltk    | time="2021-11-15T05:28:27.72" level=warning msg="Cannot list external agents" error="open /opt/extensions: no such file or directory"
-lambda-nltk    | START RequestId: 19503510-74a2-4839-a858-e34d80a7a4a8 Version: $LATEST
+lambda-nltk    | time="2021-11-16T22:06:20.703" level=info msg="extensionsDisabledByLayer(/opt/disable-extensions-jwigqn8j) -> stat /opt/disable-extensions-jwigqn8j: no such file or directory"
+lambda-nltk    | time="2021-11-16T22:06:20.703" level=warning msg="Cannot list external agents" error="open /opt/extensions: no such file or directory"
+lambda-nltk    | START RequestId: d7495129-6847-42d6-938f-2f146aeec2a9 Version: $LATEST
+spotify-client | ℹ ｢wds｣: Project is running at http://172.21.0.4/
+spotify-client | ℹ ｢wds｣: webpack output is served from 
+spotify-client | ℹ ｢wds｣: Content not from webpack is served from /usr/app/public
+spotify-client | ℹ ｢wds｣: 404s will fallback to /
+spotify-client | Starting the development server...
+spotify-client | 
 lambda-nltk    | [nltk_data] Downloading package punkt to /root/nltk_data...
-lambda-nltk    | [nltk_data]   Unzipping tokenizers/punkt.zip.
+lambda-nltk    | [nltk_data]   Package punkt is already up-to-date!
 lambda-nltk    | ['Hello', 'world', 'from', 'node']
-lambda-nltk    | END RequestId: 19503510-74a2-4839-a858-e34d80a7a4a8
-lambda-nltk    | REPORT RequestId: 19503510-74a2-4839-a858-e34d80a7a4a8	Init Duration: 0.13 ms	Duration: 3195.38 ms	Billed Duration: 3196 ms	Memory Size: 3008 MB	Max Memory Used: 3008 MB	
+lambda-nltk    | END RequestId: d7495129-6847-42d6-938f-2f146aeec2a9
+lambda-nltk    | REPORT RequestId: d7495129-6847-42d6-938f-2f146aeec2a9	Init Duration: 0.14 ms	Duration: 323.59 ms	Billed Duration: 324 ms	Memory Size: 3008 MB	Max Memory Used: 3008 MB	
 server         | 200
 server         | {
 server         |   status: 200,
 server         |   statusText: 'OK',
 server         |   headers: {
-server         |     date: 'Mon, 15 Nov 2021 05:28:30 GMT',
+server         |     date: 'Tue, 16 Nov 2021 22:06:21 GMT',
 server         |     'content-length': '101',
 server         |     'content-type': 'text/plain; charset=utf-8',
 server         |     connection: 'close'
@@ -337,9 +337,19 @@ server         |     statusCode: 200,
 server         |     body: '"Found a total of 4 tokens for given message: Hello world from node"'
 server         |   }
 server         | }
+spotify-client | Compiled successfully!
+spotify-client | 
+spotify-client | You can now view client in the browser.
+spotify-client | 
+spotify-client |   Local:            http://localhost:3000
+spotify-client |   On Your Network:  http://172.21.0.4:3000
+spotify-client | 
+spotify-client | Note that the development build is not optimized.
+spotify-client | To create a production build, use npm run build.
+spotify-client | 
 ```
 
-- This terminal will then act as a log stream of the different project services, tagged in the left column is the name of the service. For example the `lambda-nltk` service is the Python backend running NLTK and it's logs can be viewed during the incoming request.
+- This terminal will then act as a log stream of the different project services, tagged in the left column is the name of the service. For example the `lambda-nltk` service is the Python backend running NLTK and it's logs can be viewed during the incoming request. Likewise the `spotify-client` service is the client React app and it's start logs can be viewed here also.
 
 ## Terminal scripts
 - Scripts ending in -terminal will open up a terminal in the respective service. For example running:
