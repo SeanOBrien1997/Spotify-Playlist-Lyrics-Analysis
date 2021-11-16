@@ -17,6 +17,10 @@ services:
     expose:
       - 3000
     container_name: spotify-client
+    volumes:
+      - ./client/public:/usr/app/public
+      - ./client/src:/usr/app/src
+      - ./client/tsconfig.json:/usr/app/tsconfig.json
     networks:
       - local
     command: npm run start
