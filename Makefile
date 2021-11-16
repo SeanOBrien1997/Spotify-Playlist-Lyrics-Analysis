@@ -6,3 +6,5 @@ lambda-terminal:
 	docker exec -it lambda-nltk /bin/bash
 server-terminal:
 	docker exec -it server /bin/bash
+client-terminal:
+	docker exec -it spotify-client /bin/bash
