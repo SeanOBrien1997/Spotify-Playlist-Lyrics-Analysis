@@ -32,6 +32,9 @@ services:
       - ./server/src:/home/node/app/src
       - ./server/nodemon.json:/home/node/app/nodemon.json
     container_name: server
+    environment:
+      - SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID}
+      - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET}
     expose:
       - 5001
     ports:
