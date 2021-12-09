@@ -1,7 +1,7 @@
 import React from 'react';
 
-const SERVER_URL: string = 'http://server';
-const AUTH_ENDPOINT: string = 'auth/token';
+const SERVER_URL: string = 'http://localhost:5001';
+const AUTH_ENDPOINT: string = 'auth/login';
 const URL: string = `${SERVER_URL}/${AUTH_ENDPOINT}`;
 export default function LoginForm() {
   return (
