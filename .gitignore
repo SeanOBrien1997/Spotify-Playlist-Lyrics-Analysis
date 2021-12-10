@@ -130,3 +130,6 @@ client/build
 
 # testing
 /coverage
+
+# NPM package files
+package-lock.json
