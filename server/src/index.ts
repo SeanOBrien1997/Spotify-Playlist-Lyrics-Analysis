@@ -63,8 +63,12 @@ app.get('/auth/callback', async (request, response) => {
         qs.stringify(data),
         headers
       );
-      console.log(spotify_token_response.data.access_token);
-      response.redirect('http://localhost:9001');
+      const token = spotify_token_response.data.access_token;
+      console.log(token);
+      // const response_query = qs.stringify({
+      //   token: token,
+      // });
+      response.redirect('http://localhost:9001/user/' + token);
     } catch (error) {
       console.log(JSON.stringify(error));
     }

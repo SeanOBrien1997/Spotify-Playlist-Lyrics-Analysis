@@ -1,9 +1,9 @@
 import React from 'react';
-import logo from '../../logo.svg';
-import { useState } from 'react';
-import LoginForm from './LoginForm';
+import logo from '../logo.svg';
+import { useParams } from 'react-router-dom';
 
-export default function Login() {
+const User = () => {
+  const { token } = useParams();
   return (
     <div>
       <header className='App-header'>
@@ -19,8 +19,10 @@ export default function Login() {
         >
           Learn React
         </a>
-        <LoginForm></LoginForm>
       </header>
+      <p>{token}</p>
     </div>
   );
-}
+};
+
+export default User;
