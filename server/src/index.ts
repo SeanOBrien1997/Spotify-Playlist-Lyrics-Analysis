@@ -24,7 +24,10 @@ app.listen(port, () => {
 
 app.get('/auth/login', (_request, response) => {
   if (SPOTIFY_CLIENT_ID) {
-    const scopes = [Scopes.Playlists['playlist-read-private']];
+    const scopes = [
+      Scopes.Playlists['playlist-read-private'],
+      Scopes.Users['user-read-private'],
+    ];
     const state: string = randomString(STATE_SEED);
     const auth_query_parameters = new URLSearchParams({
       response_type: 'code',
