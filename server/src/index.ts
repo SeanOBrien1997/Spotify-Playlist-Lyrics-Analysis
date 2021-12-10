@@ -27,6 +27,7 @@ app.get('/auth/login', (_request, response) => {
     const scopes = [
       Scopes.Playlists['playlist-read-private'],
       Scopes.Users['user-read-private'],
+      Scopes.Users['user-read-email'],
     ];
     const state: string = randomString(STATE_SEED);
     const auth_query_parameters = new URLSearchParams({
