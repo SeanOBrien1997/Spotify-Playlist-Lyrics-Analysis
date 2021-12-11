@@ -8,3 +8,5 @@ run:
 		docker run -p $(IMAGE_PORT):8080 $(IMAGE_NAME)
 invoke:
 		curl -XPOST "http://localhost:$(IMAGE_PORT)/2015-03-31/functions/function/invocations" -d $(LAMBDA_PAYLOAD)
+get-dependencies:
+		pipreqs --force
