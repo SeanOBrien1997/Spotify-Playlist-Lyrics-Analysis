@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 interface CardProps {
   token: string;
@@ -35,16 +35,17 @@ interface Image {
 
 const Card = (props: CardProps) => {
   const { token } = props;
-  const [info, setInfo] = useState<UserProfileAPIResponse | null>();
   const [loading, setLoading] = useState(true);
-  fetchUserInformation(token)
-    .then((info) => {
-      setInfo(info);
+  const [info, setInfo] = useState<UserProfileAPIResponse>();
+  useEffect(() => {
+    setLoading(true);
+    async function fetchInfo() {
+      const userInfo = await fetchUserInformation(token);
+      setInfo(userInfo);
       setLoading(false);
-    })
-    .catch((error) => {
-      console.log(JSON.stringify(error));
-    });
+    }
+    fetchInfo();
+  }, [token]);
   return loading ? (
     <div>
       <p>Loading</p>
