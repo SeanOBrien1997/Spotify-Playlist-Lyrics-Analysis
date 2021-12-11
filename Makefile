@@ -1,5 +1,7 @@
 build:
 	docker-compose build
+fast-build:
+	docker-compose build --parallel
 run:
 	docker-compose up
 lambda-terminal:
