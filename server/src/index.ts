@@ -20,11 +20,17 @@ const SPOTIFY_LOGIN_REDIRECT_URI: string =
   'http://localhost:5001/auth/callback';
 const SPOTIFY_TOKEN_URL: string = `${SPOTIFY_ACCOUNTS_URL}/api/token`;
 
-// https://developer.spotify.com/documentation/web-playback-sdk/guide/#login-component
+/**
+ * Starts express server.
+ */
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
 
+/**
+ * Acts as route to redirect to Spotify API authentication with required auth scopes.
+ * @see https://developer.spotify.com/documentation/general/guides/authorization/code-flow/
+ */
 app.get('/auth/login', (_request, response) => {
   if (SPOTIFY_CLIENT_ID) {
     const scopes = [
@@ -50,6 +56,10 @@ app.get('/auth/login', (_request, response) => {
   }
 });
 
+/**
+ * Acts as callback route to generate token using authorization code received after logging in.
+ * @see https://developer.spotify.com/documentation/general/guides/authorization/code-flow/
+ */
 app.get('/auth/callback', async (request, response) => {
   const code = request.query.code;
   const state = request.query.state;
