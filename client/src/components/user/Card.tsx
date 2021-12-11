@@ -1,4 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faNapster, faSpotify } from '@fortawesome/free-brands-svg-icons';
+import ReactCountryFlag from 'react-country-flag';
+import './Card.css';
 
 interface CardProps {
   token: string;
@@ -51,11 +55,56 @@ const Card = (props: CardProps) => {
       <p>Loading</p>
     </div>
   ) : (
-    <div>
-      <p>
-        Hello {info?.display_name}, from {info?.country}
-      </p>
-    </div>
+    <aside className='profile-card'>
+      <header>
+        <a
+          href={info?.external_urls.spotify}
+          target='_blank'
+          rel='noopener noreferrer'
+        >
+          {
+            <div className='profile-card-image-root'>
+              {info?.images[0]?.url ? (
+                <div className='profile-card-image-container'>
+                  <img src={info.images[0].url} alt='User' />
+                </div>
+              ) : (
+                <div className='profile-card-icon-container'>
+                  <FontAwesomeIcon
+                    icon={faNapster}
+                    color='green'
+                    size='4x'
+                  ></FontAwesomeIcon>
+                </div>
+              )}
+            </div>
+          }
+        </a>
+        <h3>{info?.display_name}</h3>
+        <div id='user-country'>
+          {info?.country ? (
+            <ReactCountryFlag countryCode={info.country} />
+          ) : (
+            <p></p>
+          )}
+        </div>
+      </header>
+      <div id='profile-bio'>
+        <p>Followers: {info?.followers.total}</p>
+        <p>Account Type: {info?.product}</p>
+      </div>
+      <ul id='profile-social-links'>
+        <li>
+          <a
+            href={info?.external_urls.spotify}
+            target='_blank'
+            rel='noopener noreferrer'
+          >
+            <FontAwesomeIcon icon={faSpotify} color='green' size='1x' />
+          </a>
+        </li>
+      </ul>
+    </aside>
   );
 };
 
