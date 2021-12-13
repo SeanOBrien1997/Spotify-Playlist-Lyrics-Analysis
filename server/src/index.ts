@@ -1,9 +1,17 @@
-import express from 'express';
+import express, { request, response } from 'express';
 import axios from 'axios';
 import dotenv from 'dotenv';
 import qs from 'qs';
+import cors from 'cors';
 
 const app = express();
+
+app.use(
+  cors({
+    origin: 'http://localhost:9001',
+  })
+);
+
 dotenv.config();
 const port: number = 5001;
 const STATE_SEED: number = 16;
@@ -111,6 +119,14 @@ app.get('/auth/callback', async (request, response) => {
  * TODO
  */
 app.get('/auth/token', (request, response) => {});
+
+app.post('/nltk/stats', (request, response) => {
+  console.log(request.body);
+  response.json({
+    status: 200,
+    body: 'Hello',
+  });
+});
 
 const randomString = (length: number): string => {
   let text: string = '';
