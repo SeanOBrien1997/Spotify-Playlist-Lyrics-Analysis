@@ -75,7 +75,7 @@ const Playlists = (props: PlaylistProps) => {
   const formSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
     selectedPlaylist
-      ? navigate(`/dashboard/${selectedPlaylist}`)
+      ? navigate(`/user/${token}/dashboard/${selectedPlaylist}`)
       : alert('No playlist selected');
   };
 
