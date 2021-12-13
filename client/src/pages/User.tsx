@@ -8,8 +8,10 @@ const User = () => {
   if (token) {
     return (
       <div className='App-header'>
-        <Card token={token}></Card>
-        <Playlists token={token}></Playlists>
+        {/* <Card token={token}></Card> */}
+        <div>
+          <Playlists token={token}></Playlists>
+        </div>
       </div>
     );
   } else {

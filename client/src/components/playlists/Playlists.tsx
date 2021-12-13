@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface PlaylistProps {
   token: string;
@@ -53,42 +54,106 @@ type Image = {
 
 const Playlists = (props: PlaylistProps) => {
   const { token } = props;
+  const [loading, setLoading] = useState(true);
+  const [playlistsResponse, setPlaylistsResponse] =
+    useState<UserPlaylistsAPIResponse>();
   useEffect(() => {
+    setLoading(true);
     async function fetchPlaylists() {
       const userPlaylists = await fetchUserPlaylists(token);
+      setPlaylistsResponse(userPlaylists);
+      setLoading(false);
     }
     fetchPlaylists();
   }, [token]);
-  return (
+
+  const [selectedPlaylist, setSelectedPlaylist] = useState<string>();
+  const radioHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedPlaylist(e.currentTarget.value);
+  };
+  const navigate = useNavigate();
+  const formSubmit = (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    selectedPlaylist
+      ? navigate(`/dashboard/${selectedPlaylist}`)
+      : alert('No playlist selected');
+  };
+
+  return loading ? (
     <div>
-      <p>Playlists</p>
+      <p>Loading playlists...</p>
+    </div>
+  ) : (
+    <div>
+      <h3>You have {playlistsResponse?.total} playlist(s):</h3>
+      <div>
+        <form onSubmit={formSubmit}>
+          {playlistsResponse?.items.map(function (playlist, index) {
+            return (
+              <div>
+                <dl>
+                  <dt>
+                    <img src={playlist.images[0].url} alt='Playlist art' />
+                    <p>Owner: {playlist.owner.display_name}</p>
+                    <p>
+                      <a
+                        href={playlist.external_urls.spotify}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                      >
+                        {playlist.name}
+                      </a>
+                    </p>
+                    <p>Number of tracks: {playlist.tracks.total}</p>
+                  </dt>
+                </dl>
+                <input
+                  type='radio'
+                  name='playlist'
+                  id={playlist.id}
+                  onChange={radioHandler}
+                  value={playlist.id}
+                />
+              </div>
+            );
+          })}
+          <button type='submit'>Submit</button>
+        </form>
+      </div>
     </div>
   );
 };
 
-const fetchUserPlaylists = async (token: string) => {
-  const SPOTIFY_ENDPOINT: string = 'https://api.spotify.com/v1/me/playlists';
-  try {
-    const response = await fetch(SPOTIFY_ENDPOINT, {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + token,
-      },
-    });
-    if (response.ok) {
-      const playlists = ((await response.json()) as UserPlaylistsAPIResponse)
-        .items;
-      playlists.forEach((playlist) => {
-        console.log(playlist.name);
+const fetchUserPlaylists = async (
+  token: string
+): Promise<UserPlaylistsAPIResponse> => {
+  return new Promise<UserPlaylistsAPIResponse>(async (resolve, reject) => {
+    const SPOTIFY_ENDPOINT: string = 'https://api.spotify.com/v1/me/playlists';
+    try {
+      const response = await fetch(SPOTIFY_ENDPOINT, {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + token,
+        },
       });
-    } else {
-      console.error(JSON.stringify(response));
+      if (response.ok) {
+        const userPlaylistsResponse =
+          (await response.json()) as UserPlaylistsAPIResponse;
+        resolve(userPlaylistsResponse);
+      } else {
+        console.error(JSON.stringify(response));
+        reject(`Invalid response from Spotify ${response.status}`);
+      }
+    } catch (error) {
+      reject(
+        `Unexpected error whilst fetching user playlist information: ${JSON.stringify(
+          error
+        )}`
+      );
     }
-  } catch (error) {
-    console.error(JSON.stringify(error));
-  }
+  });
 };
 
 export default Playlists;
