@@ -105,23 +105,27 @@ const Dashboard = () => {
       if (token && playlistid) {
         const tracks = await fetchPlaylistTrackIDs(token, playlistid);
         setTracks(tracks);
+        try {
+          const response = await fetch('http://localhost:5001/nltk/stats', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: 'application/json',
+            },
+            body: JSON.stringify({
+              message: 'hello world',
+            }),
+          });
+          console.log(response.status);
+        } catch (error) {
+          console.log('error');
+          console.log(error);
+        }
         setLoading(false);
       }
     }
     fetchTracks();
   }, [token]);
-
-  useEffect(() => {
-    console.log('Tracks updated');
-    setLoadingMessage('Loading graph data');
-    setLoading(true);
-    tracks?.forEach((track) => {
-      alert(
-        `${track.track.name} by ${track.track.artists[0].name} added by ${track.added_by.external_urls.spotify}`
-      );
-    });
-    setLoading(false);
-  }, [tracks]);
 
   return loading ? (
     <div>
