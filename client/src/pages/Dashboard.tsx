@@ -113,7 +113,7 @@ const Dashboard = () => {
               Accept: 'application/json',
             },
             body: JSON.stringify({
-              message: 'hello world',
+              tracks: tracks,
             }),
           });
           console.log(response.status);

@@ -3,23 +3,25 @@ import axios from 'axios';
 import dotenv from 'dotenv';
 import qs from 'qs';
 import cors from 'cors';
+//@ts-ignore
+import { getLyrics, getSong } from 'genius-lyrics-api'; // no types available through source or DefinitelyTyped.
 
 const app = express();
+const port: number = 5001;
 
 app.use(
   cors({
     origin: 'http://localhost:9001',
   })
 );
-
+app.use(express.json());
 dotenv.config();
-const port: number = 5001;
-const STATE_SEED: number = 16;
 
 const LAMBDA_BASE_URL: string = 'http://lambda-nltk';
 const LAMBDA_PORT: number = 8080;
 const LAMBDA_ENDPOINT: string = '2015-03-31/functions/function/invocations';
 const LAMBDA_URL: string = `${LAMBDA_BASE_URL}:${LAMBDA_PORT}/${LAMBDA_ENDPOINT}`;
+
 const SPOTIFY_CLIENT_ID: string | undefined = process.env.SPOTIFY_CLIENT_ID;
 const SPOTIFY_CLIENT_SECRET: string | undefined =
   process.env.SPOTIFY_CLIENT_SECRET;
@@ -27,6 +29,13 @@ const SPOTIFY_ACCOUNTS_URL: string = 'https://accounts.spotify.com';
 const SPOTIFY_LOGIN_REDIRECT_URI: string =
   'http://localhost:5001/auth/callback';
 const SPOTIFY_TOKEN_URL: string = `${SPOTIFY_ACCOUNTS_URL}/api/token`;
+const STATE_SEED: number = 16;
+
+const GENIUS_CLIENT_ID: string | undefined = process.env.GENIUS_CLIENT_ID;
+const GENIUS_CLIENT_SECRET: string | undefined =
+  process.env.GENIUS_CLIENT_SECRET;
+const GENIUS_CLIENT_ACCESS_TOKEN: string | undefined =
+  process.env.GENIUS_CLIENT_ACCESS_TOKEN;
 
 /**
  * Starts express server.
@@ -122,8 +131,25 @@ app.get('/auth/token', (request, response) => {});
 
 app.post('/nltk/stats', (request, response) => {
   console.log(request.body);
-  response.json({
-    status: 200,
+  const tracks = request.body.tracks as Tracks[];
+  const trackLyrics = new Map<Tracks, string>();
+  tracks.forEach(async (track) => {
+    const trackName = track.track.name;
+    const trackArtists = track.track.artists;
+    console.log(`${trackName} by ${trackArtists[0].name}`);
+    const geniusOptions = {
+      apiKey: GENIUS_CLIENT_ACCESS_TOKEN,
+      title: trackName,
+      artist: trackArtists[0].name,
+      optimizeQuery: true,
+    };
+    const lyrics: string = await getLyrics(geniusOptions);
+    if (lyrics) {
+      trackLyrics.set(track, lyrics);
+    }
+  });
+
+  response.status(200).json({
     body: 'Hello',
   });
 });
@@ -189,4 +215,82 @@ const Scopes = {
     'playlist-read-private': 'playlist-read-private',
     'playlist-modify-public': 'playlist-modify-public',
   },
+};
+
+type Tracks = {
+  added_at: string;
+  added_by: {
+    external_urls: {
+      spotify: string;
+    };
+    href: string;
+    id: string;
+    type: string;
+    uri: string;
+  };
+  is_local: boolean;
+  primary_color: null;
+  track: Track;
+  video_thumbnail: {
+    url: string;
+  };
+};
+
+type Image = {
+  height: number;
+  url: string;
+  width: number;
+};
+
+type Artist = {
+  external_urls: {
+    spotify: string;
+  };
+  href: string;
+  id: string;
+  name: string;
+  type: string;
+  uri: string;
+};
+
+type Track = {
+  album: {
+    album_type: string;
+    artists: Artist[];
+    available_markets: string[];
+    external_urls: {
+      spotify: string;
+    };
+    href: string;
+    id: string;
+    images: Image[];
+    name: string;
+    release_date: string;
+    release_date_precision: string;
+    total_tracks: number;
+    type: string;
+    uri: string;
+  };
+  artists: Artist[];
+  available_markets: string[];
+  disc_number: number;
+  duration_ms: number;
+  episode: boolean;
+  explicit: boolean;
+  external_ids: {
+    isrc: string;
+  };
+  external_urls: {
+    spotify: string;
+  };
+  href: string;
+  id: string;
+  is_local: boolean;
+  name: string;
+  popularity: number;
+  preview_url: string;
+  track: boolean;
+  track_number: number;
+  type: string;
+  uri: string;
 };
