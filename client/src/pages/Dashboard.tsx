@@ -90,15 +90,42 @@ type Tracks = {
   };
 };
 
+type Sentiment = {
+  negative: number;
+  neutral: number;
+  positive: number;
+  compound: number;
+};
+
+type AnalysisResponse = {
+  analysis: {
+    body: {
+      frequencies: Object;
+      sentiment: Sentiment;
+    };
+    statusCode: number;
+  };
+  track: Track;
+};
+
+type NLTKResponse = {
+  body: {
+    failures: number;
+    lyricFailures: number;
+    responses: AnalysisResponse[];
+    successes: number;
+  };
+};
+
 const Dashboard = () => {
   const { token, playlistid } = useParams();
 
   const [loading, setLoading] = useState(true);
   const [tracks, setTracks] = useState<Tracks[]>();
   const [loadingMessage, setLoadingMessage] = useState('Loading');
+  const [analysisResponses, setAnalysisResponses] = useState<NLTKResponse>();
 
   useEffect(() => {
-    console.log('Running');
     setLoadingMessage('Loading tracks');
     setLoading(true);
     async function fetchTracks() {
@@ -116,7 +143,8 @@ const Dashboard = () => {
               tracks: tracks,
             }),
           });
-          console.log(response.status);
+          const analysisResponse = (await response.json()) as NLTKResponse;
+          setAnalysisResponses(analysisResponse);
         } catch (error) {
           console.log('error');
           console.log(error);
@@ -125,7 +153,7 @@ const Dashboard = () => {
       }
     }
     fetchTracks();
-  }, [token]);
+  }, [token, playlistid]);
 
   return loading ? (
     <div>
@@ -134,7 +162,9 @@ const Dashboard = () => {
   ) : (
     <div>
       <p>Loaded</p>
-      <p>{tracks?.length}</p>
+      <p>
+        {tracks?.length} {analysisResponses?.body.successes}
+      </p>
       <p>{tracks ? getTrackName(tracks[0].track) : 'Nada'}</p>
       <p>{tracks ? tracks[0].track.artists[0].name : 'Nada'}</p>
     </div>
@@ -164,7 +194,6 @@ const fetchPlaylistTrackIDs = async (
         const trackResponse =
           (await response.json()) as PlaylistTracksAPIResponse;
         const tracks = trackResponse.items;
-        console.log(`Found ${tracks.length} tracks`);
         resolve(tracks);
       } else {
         reject(`Invalid response received from Spotify ${response.status}`);

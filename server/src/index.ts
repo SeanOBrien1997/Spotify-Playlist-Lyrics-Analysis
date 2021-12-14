@@ -184,14 +184,24 @@ app.post('/nltk/stats', async (request, response) => {
   console.log(
     `successes: ${successes} failures: ${failures} lyric fails: ${lyricFailures}`
   );
+  const formattedResponse = [];
   for (const [track, response] of lambdaResponses) {
     console.log(
       track.track.name + ' by ' + track.track.artists[0].name + ' was analysed'
     );
+    formattedResponse.push({
+      track: track.track,
+      analysis: response,
+    });
     console.log(JSON.stringify(response));
   }
   response.status(200).json({
-    body: 'Hello',
+    body: {
+      successes: successes,
+      failures: failures,
+      lyricFailures: lyricFailures,
+      responses: formattedResponse,
+    },
   });
 });
 
