@@ -129,11 +129,14 @@ app.get('/auth/callback', async (request, response) => {
  */
 app.get('/auth/token', (request, response) => {});
 
-app.post('/nltk/stats', (request, response) => {
+app.post('/nltk/stats', async (request, response) => {
   console.log(request.body);
   const tracks = request.body.tracks as Tracks[];
   const trackLyrics = new Map<Tracks, string>();
-  tracks.forEach(async (track) => {
+  let successes = 0;
+  let failures = 0;
+  let lyricFailures = 0;
+  for (const track of tracks) {
     const trackName = track.track.name;
     const trackArtists = track.track.artists;
     console.log(`${trackName} by ${trackArtists[0].name}`);
@@ -146,9 +149,47 @@ app.post('/nltk/stats', (request, response) => {
     const lyrics: string = await getLyrics(geniusOptions);
     if (lyrics) {
       trackLyrics.set(track, lyrics);
+    } else {
+      console.error(
+        `Could not get lyrics for ${track.track.name} by ${track.track.artists[0].name}`
+      );
+      lyricFailures++;
+    }
+  }
+
+  const lambdaResponses = new Map<Tracks, Object>();
+  const lambdaPromises: Promise<Object>[] = [];
+
+  for (const [_track, lyrics] of trackLyrics) {
+    lambdaPromises.push(lambdaRequest(lyrics));
+  }
+
+  await Promise.allSettled(lambdaPromises).then((values) => {
+    let index = 0;
+    for (const [track, _lyrics] of trackLyrics) {
+      const promise = values[index];
+      if (promise.status === 'fulfilled') {
+        lambdaResponses.set(track, promise.value);
+        successes++;
+      } else {
+        failures++;
+        console.error(
+          `Lambda service rejected song ${track.track.name} by ${track.track.artists[0].name} for: ${promise.reason}`
+        );
+      }
+      index++;
     }
   });
-
+  console.log('Total tracks polled for ' + tracks.length);
+  console.log(
+    `successes: ${successes} failures: ${failures} lyric fails: ${lyricFailures}`
+  );
+  for (const [track, response] of lambdaResponses) {
+    console.log(
+      track.track.name + ' by ' + track.track.artists[0].name + ' was analysed'
+    );
+    console.log(JSON.stringify(response));
+  }
   response.status(200).json({
     body: 'Hello',
   });
@@ -164,19 +205,25 @@ const randomString = (length: number): string => {
   return text;
 };
 
-const lambdaRequest = (msg: string) => {
+const lambdaRequest = async (msg: string): Promise<Object> => {
+  return new Promise<Object>(async (resolve, reject) => {
+    try {
+      const response = await axios.post(LAMBDA_URL, {
+        message: msg,
+      });
+      if (response.status === 200) {
+        resolve(response.data);
+      } else {
+        reject(
+          `Invalid status code received when sending lyrics to NLTK ${response.status}`
+        );
+      }
+    } catch (error) {
+      console.error(JSON.stringify(error));
+      reject('Unexpected error when invoking the Lambda service.');
+    }
+  });
   console.log('Sending request to: ' + LAMBDA_URL);
-  axios
-    .post(LAMBDA_URL, {
-      message: msg,
-    })
-    .then((res) => {
-      console.log(res.status);
-      console.log(res);
-    })
-    .catch((error) => {
-      console.error(error);
-    });
 };
 
 const Scopes = {
