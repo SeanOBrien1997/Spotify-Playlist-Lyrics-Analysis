@@ -42,6 +42,7 @@ const GENIUS_CLIENT_ACCESS_TOKEN: string | undefined =
  */
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
+
 });
 
 /**
@@ -160,26 +161,18 @@ app.post('/nltk/stats', async (request, response) => {
   const lambdaResponses = new Map<Tracks, Object>();
   const lambdaPromises: Promise<Object>[] = [];
 
-  for (const [_track, lyrics] of trackLyrics) {
-    lambdaPromises.push(lambdaRequest(lyrics));
+  for (const [track, lyrics] of trackLyrics) {
+    try {
+      const response = await lambdaRequest(lyrics);
+      lambdaResponses.set(track,response);
+      successes++;
+    } catch (error) {
+      console.error(`Error invoking the lamba service ${JSON.stringify(error)}`);
+      failures++;
+    }
+    
   }
 
-  await Promise.allSettled(lambdaPromises).then((values) => {
-    let index = 0;
-    for (const [track, _lyrics] of trackLyrics) {
-      const promise = values[index];
-      if (promise.status === 'fulfilled') {
-        lambdaResponses.set(track, promise.value);
-        successes++;
-      } else {
-        failures++;
-        console.error(
-          `Lambda service rejected song ${track.track.name} by ${track.track.artists[0].name} for: ${promise.reason}`
-        );
-      }
-      index++;
-    }
-  });
   console.log('Total tracks polled for ' + tracks.length);
   console.log(
     `successes: ${successes} failures: ${failures} lyric fails: ${lyricFailures}`
