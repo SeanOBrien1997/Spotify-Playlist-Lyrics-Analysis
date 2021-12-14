@@ -178,14 +178,58 @@ type AudioAnalysisTrackData = {
   rhythm_version: number;
 };
 
+type Bar = {
+  start: number;
+  duration: number;
+  confidence: number;
+};
+
+type Beat = {
+  start: number;
+  duration: number;
+  confidence: number;
+};
+
+type Section = {
+  start: number;
+  duration: number;
+  confidence: number;
+  loudness: number;
+  tempo: number;
+  tempo_confidence: number;
+  key: number;
+  key_confidence: number;
+  mode: number;
+  mode_confidence: number;
+  time_signature: number;
+  time_signature_confidence: number;
+};
+
+type Pitch = number;
+type Timbre = Pitch;
+
+type Segment = {
+  start: number;
+  duration: number;
+  confidence: number;
+  loudness_start: number;
+  loudness_max: number;
+  loudness_max_time: number;
+  loudness_end: number;
+  pitches: Pitch[];
+  timbre: Timbre[];
+};
+
+type Tatum = Beat;
+
 type AudioAnalysisAPIResponse = {
   meta: AudioAnalysisMetaData;
-  track: {};
-  bars: [];
-  beats: [];
-  sections: [];
-  segments: [];
-  tatums: [];
+  track: AudioAnalysisTrackData;
+  bars: Bar[];
+  beats: Beat[];
+  sections: Section[];
+  segments: Segment[];
+  tatums: Tatum[];
 };
 
 const Dashboard = () => {
@@ -229,6 +273,29 @@ const Dashboard = () => {
     fetchTracks();
   }, [token, playlistid]);
 
+  useEffect(() => {
+    if (tracks) {
+      console.log('Running');
+      console.log(tracks);
+      setLoadingMessage('Fetching track audio features');
+      setLoading(true);
+      fetchAudioFeatures();
+    }
+    async function fetchAudioFeatures() {
+      if (token && tracks) {
+        try {
+          const features = await fetchAudioFeaturesForTracks(tracks, token);
+          console.log(Object.keys(features));
+          setAudioFeatures(features);
+          console.log('Audio features updated');
+        } catch (error) {
+          console.error(`Error fetching audio features ${error}`);
+        }
+      }
+      setLoading(false);
+    }
+  }, [tracks]);
+
   return loading ? (
     <div>
       <p>{loadingMessage}...</p>
@@ -245,9 +312,21 @@ const Dashboard = () => {
       <p>{tracks ? tracks[0].track.artists[0].name : 'Nada'}</p>
       <div>
         {analysisResponses ? (
-          <WordCloud data={getWordCloudArray(analysisResponses)}></WordCloud>
+          <WordCloud data={getWordCloudArray(analysisResponses)} />
         ) : (
           <p>No analysis data defined</p>
+        )}
+      </div>
+      <div>
+        {audioFeatures ? (
+          <div>
+            <p>Audio features found</p>
+            <p>Energy: {audioFeatures.length}</p>
+          </div>
+        ) : (
+          <div>
+            <p>Audio features not found</p>
+          </div>
         )}
       </div>
     </div>
@@ -257,6 +336,25 @@ const Dashboard = () => {
 type WordCloudDataPoint = {
   text: string;
   value: number;
+};
+
+const getScatterPlotArray = (obj: NLTKResponse): ScatterPlotData[] => {
+  const data: ScatterPlotData[] = [];
+  const responses = obj.body.responses;
+  responses.forEach((response) => {
+    const positive = response.analysis.body.sentiment.positive;
+    const negative = response.analysis.body.sentiment.negative;
+    data.push({
+      positive: positive,
+      negative: negative,
+    });
+  });
+  return data;
+};
+
+type ScatterPlotData = {
+  positive: number;
+  negative: number;
 };
 
 const getWordCloudArray = (obj: NLTKResponse): WordCloudDataPoint[] => {
@@ -271,12 +369,48 @@ const getWordCloudArray = (obj: NLTKResponse): WordCloudDataPoint[] => {
       data.push(dataPoint);
     });
   });
-  console.log(data);
   return data;
 };
 
 const getTrackName = (track: Track) => {
   return track.name;
+};
+
+const fetchAudioFeaturesForTracks = async (
+  tracks: Tracks[],
+  token: string
+): Promise<AudioFeatureAPIResponse[]> => {
+  return new Promise<AudioFeatureAPIResponse[]>(async (resolve, reject) => {
+    let endpoint = 'https://api.spotify.com/v1/audio-features?ids=';
+    for (let i = 0; i < tracks.length - 1; i++) {
+      endpoint += tracks[i].track.id + '%2';
+    }
+    endpoint += tracks[tracks.length - 1].track.id;
+    try {
+      const response = await fetch(endpoint, {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+          'Content-type': 'application/json',
+          Authorization: 'Bearer ' + token,
+        },
+      });
+      if (response.ok) {
+        type t = {
+          audio_features: AudioFeatureAPIResponse[];
+        };
+        const audioFeatureResponseObj = (await response.json()) as t;
+        const audioFeatureResponse = audioFeatureResponseObj.audio_features;
+        resolve(audioFeatureResponse);
+      }
+    } catch (error) {
+      reject(
+        `Unexpected error when trying to fetch song features ${JSON.stringify(
+          error
+        )}`
+      );
+    }
+  });
 };
 
 const fetchPlaylistTrackIDs = async (
