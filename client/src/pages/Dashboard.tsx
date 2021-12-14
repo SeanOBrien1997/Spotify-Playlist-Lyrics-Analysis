@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import Playlists from '../components/playlists/Playlists';
+import * as d3 from 'd3';
+import WordCloud from 'react-d3-cloud';
 
 interface PlaylistTracksAPIResponse {
   href: string;
@@ -138,6 +139,55 @@ type AudioFeatureAPIResponse = {
   valence: number;
 };
 
+type AudioAnalysisMetaData = {
+  analyzer_version: string;
+  platform: string;
+  detailed_status: string;
+  status_code: number;
+  timestamp: number;
+  analysis_time: number;
+  input_process: string;
+};
+
+type AudioAnalysisTrackData = {
+  num_samples: number;
+  duration: number;
+  sample_md5: string;
+  offset_seconds: number;
+  window_seconds: number;
+  analysis_sample_rate: number;
+  analysis_channels: number;
+  end_of_fade_in: number;
+  start_of_fade_out: number;
+  loudness: number;
+  tempo: number;
+  tempo_confidence: number;
+  time_signature: number;
+  time_signature_confidence: number;
+  key: number;
+  key_confidence: number;
+  mode: number;
+  mode_confidence: number;
+  codestring: string;
+  code_version: number;
+  echoprintstring: string;
+  echoprint_version: number;
+  synchstring: string;
+  synch_version: number;
+  rhythmstring: string;
+  rhythm_version: number;
+};
+
+type AudioAnalysisAPIResponse = {
+  meta: AudioAnalysisMetaData;
+  track: {};
+  bars: [];
+  beats: [];
+  sections: [];
+  segments: [];
+  tatums: [];
+};
+
 const Dashboard = () => {
   const { token, playlistid } = useParams();
 
@@ -147,6 +197,7 @@ const Dashboard = () => {
   const [analysisResponses, setAnalysisResponses] = useState<NLTKResponse>();
   const [audioFeatures, setAudioFeatures] =
     useState<AudioFeatureAPIResponse[]>();
+  const [audioAnalysis, setAudioAnalysis] = useState();
 
   useEffect(() => {
     setLoadingMessage('Loading tracks');
@@ -187,13 +238,41 @@ const Dashboard = () => {
       <p>Loaded</p>
       <p>
         {tracks?.length} {analysisResponses?.body.successes}{' '}
-        {analysisResponses?.body.failures}{' '}
+        {analysisResponses?.body.failures}
         {analysisResponses?.body.lyricFailures}
       </p>
       <p>{tracks ? getTrackName(tracks[0].track) : 'Nada'}</p>
       <p>{tracks ? tracks[0].track.artists[0].name : 'Nada'}</p>
+      <div>
+        {analysisResponses ? (
+          <WordCloud data={getWordCloudArray(analysisResponses)}></WordCloud>
+        ) : (
+          <p>No analysis data defined</p>
+        )}
+      </div>
     </div>
   );
+};
+
+type WordCloudDataPoint = {
+  text: string;
+  value: number;
+};
+
+const getWordCloudArray = (obj: NLTKResponse): WordCloudDataPoint[] => {
+  const responses = obj.body.responses;
+  const data: WordCloudDataPoint[] = [];
+  responses.forEach((response) => {
+    const frequencies = response.analysis.body.frequencies;
+    const keys = Object.keys(frequencies);
+    const vals = Object.values(frequencies) as number[];
+    keys.forEach((key, i) => {
+      const dataPoint: WordCloudDataPoint = { text: key, value: vals[i] };
+      data.push(dataPoint);
+    });
+  });
+  console.log(data);
+  return data;
 };
 
 const getTrackName = (track: Track) => {
