@@ -186,7 +186,9 @@ const Dashboard = () => {
     <div>
       <p>Loaded</p>
       <p>
-        {tracks?.length} {analysisResponses?.body.successes}
+        {tracks?.length} {analysisResponses?.body.successes}{' '}
+        {analysisResponses?.body.failures}{' '}
+        {analysisResponses?.body.lyricFailures}
       </p>
       <p>{tracks ? getTrackName(tracks[0].track) : 'Nada'}</p>
       <p>{tracks ? tracks[0].track.artists[0].name : 'Nada'}</p>

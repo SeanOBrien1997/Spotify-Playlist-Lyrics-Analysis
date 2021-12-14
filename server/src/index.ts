@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import qs from 'qs';
 import cors from 'cors';
 //@ts-ignore
-import { getLyrics, getSong } from 'genius-lyrics-api'; // no types available through source or DefinitelyTyped.
+import { getLyrics } from 'genius-lyrics-api'; // no types available through source or DefinitelyTyped.
 
 const app = express();
 const port: number = 5001;
@@ -14,7 +14,7 @@ app.use(
     origin: 'http://localhost:9001',
   })
 );
-app.use(express.json());
+app.use(express.json({ limit: '100mb' }));
 dotenv.config();
 
 const LAMBDA_BASE_URL: string = 'http://lambda-nltk';
@@ -42,7 +42,6 @@ const GENIUS_CLIENT_ACCESS_TOKEN: string | undefined =
  */
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
-
 });
 
 /**
@@ -164,13 +163,14 @@ app.post('/nltk/stats', async (request, response) => {
   for (const [track, lyrics] of trackLyrics) {
     try {
       const response = await lambdaRequest(lyrics);
-      lambdaResponses.set(track,response);
+      lambdaResponses.set(track, response);
       successes++;
     } catch (error) {
-      console.error(`Error invoking the lamba service ${JSON.stringify(error)}`);
+      console.error(
+        `Error invoking the lamba service ${JSON.stringify(error)}`
+      );
       failures++;
     }
-    
   }
 
   console.log('Total tracks polled for ' + tracks.length);
