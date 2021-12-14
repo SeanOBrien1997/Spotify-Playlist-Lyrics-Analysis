@@ -114,7 +114,6 @@ const fetchUserInformation = async (
   return new Promise<UserProfileAPIResponse>(async (resolve, reject) => {
     const SPOTIFY_ENDPOINT: string = 'https://api.spotify.com/v1/me';
     try {
-      console.log('Sending spotify request');
       const response = await fetch(SPOTIFY_ENDPOINT, {
         method: 'GET',
         headers: {
@@ -123,11 +122,11 @@ const fetchUserInformation = async (
           Authorization: 'Bearer ' + token,
         },
       });
-      console.log('Response from spotify: ' + JSON.stringify(response));
       if (response.ok) {
         const userInfo = (await response.json()) as UserProfileAPIResponse;
         resolve(userInfo);
       } else {
+        console.error(JSON.stringify(response));
         reject(`Invalid response from Spotify ${response.status}`);
       }
     } catch (error) {
