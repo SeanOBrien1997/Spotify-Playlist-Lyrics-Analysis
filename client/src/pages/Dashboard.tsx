@@ -117,6 +117,27 @@ type NLTKResponse = {
   };
 };
 
+type AudioFeatureAPIResponse = {
+  acousticness: number;
+  analysis_url: string;
+  danceability: number;
+  duration_ms: number;
+  energy: number;
+  id: string;
+  instrumentalness: number;
+  key: number;
+  liveness: number;
+  loudness: number;
+  mode: number;
+  speechiness: number;
+  tempo: number;
+  time_signature: number;
+  track_href: string;
+  type: string;
+  uri: string;
+  valence: number;
+};
+
 const Dashboard = () => {
   const { token, playlistid } = useParams();
 
@@ -124,6 +145,8 @@ const Dashboard = () => {
   const [tracks, setTracks] = useState<Tracks[]>();
   const [loadingMessage, setLoadingMessage] = useState('Loading');
   const [analysisResponses, setAnalysisResponses] = useState<NLTKResponse>();
+  const [audioFeatures, setAudioFeatures] =
+    useState<AudioFeatureAPIResponse[]>();
 
   useEffect(() => {
     setLoadingMessage('Loading tracks');
