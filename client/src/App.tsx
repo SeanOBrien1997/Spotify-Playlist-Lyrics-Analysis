@@ -5,6 +5,7 @@ import Login from './pages/Login';
 import User from './pages/User';
 import Dashboard from './pages/Dashboard';
 import Navbar from './components/nav/Navbar';
+import About from './pages/About';
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
       <Router>
         <Navbar />
         <Routes>
+          <Route path= '/About' element={<About/>}> </Route>
           <Route path='/' element={<Login />}></Route>
           <Route path='/user/:token' element={<User />}></Route>
           <Route

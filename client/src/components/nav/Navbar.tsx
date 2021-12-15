@@ -4,12 +4,24 @@ import '../../App.css';
 
 const Navbar = () => {
   return (
-    <div>
-      <ul>
+    <div className = 'Navbar'>
+      <ul className='ul'>
+        <li>
         <Link to={'/'}>
-          <li>Home</li>
+         <button className ='Button'> Home </button>
         </Link>
+        </li >
+
+        <li>
+        <Link to={'/About'}>
+         <button className ='AboutButton'> About </button>
+        </Link>
+        </li>
       </ul>
+     
+
+      
+
     </div>
   );
 };

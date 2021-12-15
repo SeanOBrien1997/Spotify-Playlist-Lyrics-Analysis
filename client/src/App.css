@@ -36,3 +36,44 @@
     transform: rotate(360deg);
   }
 }
+.Navbar {
+  overflow: hidden;
+  background-color: #1Db954;
+  padding-bottom: 15px;
+  padding-top: 15px;
+  
+}
+
+.Button{
+  background-color: #282c34; /* Green */
+  border-radius: 4px;
+  padding: 10px;
+  width: 100px;
+  text-decoration: none;
+  font-size: 16px;
+  margin: 2px;
+  
+  
+}
+.AboutButton{
+  background-color: #282c34; /* Green */
+  border-radius: 4px;
+  padding: 10px;
+  width: 100px;
+  text-decoration: none;
+  font-size: 16px;
+  margin: 2px;
+  
+ 
+}
+ul, li {
+  display:inline
+  
+}
+
+ul{
+  margin-left: -1400px;
+}
+
+
+
