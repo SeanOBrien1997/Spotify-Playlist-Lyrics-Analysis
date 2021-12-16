@@ -4,7 +4,8 @@ import '../../App.css';
 
 const Navbar = () => {
   return (
-    <div className = 'Navbar'>
+    <div className = 'Navbar'> 
+    <div className = 'Heading'>Spotify Lyric Playlist Analyzer</div>
       <ul className='ul'>
         <li>
         <Link to={'/'}>

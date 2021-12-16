@@ -13,7 +13,7 @@ function App() {
       <Router>
         <Navbar />
         <Routes>
-          <Route path= '/About' element={<About/>}> </Route>
+          <Route path= '/About' element={<About />}> </Route>
           <Route path='/' element={<Login />}></Route>
           <Route path='/user/:token' element={<User />}></Route>
           <Route
