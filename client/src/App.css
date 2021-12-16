@@ -139,3 +139,7 @@ ul {
   margin-top: 1.5em;
   height: 0.1em;
 }
+
+.Slider-Container {
+  display: inline-block;
+}

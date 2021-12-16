@@ -1,16 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import * as d3 from 'd3';
-import WordCloud from 'react-d3-cloud';
 import Tracks from '../model/spotify/Tracks';
 import NLTKResponse from '../model/nltk/NLTKResponse';
 import AudioFeatures from '../model/spotify/AudioFeatures';
 import AudioAnalysisAPIResponse from '../model/spotify/AudioAnalysisAPIResponse';
-import ScatterPlotData from '../model/wordcloud/ScatterPlotData';
-import WordCloudDataPoint from '../model/wordcloud/WordCloudDataPoint';
-import Track from '../model/spotify/Track';
 import AudioFeaturesAPIResponse from '../model/spotify/AudioFeaturesAPIResponse';
 import PlaylistTracksAPIResponse from '../model/spotify/PlaylistTracksAPIResponse';
+import SliderWordCloud from '../components/d3/SliderWordCloud';
+import ScatterChart from '../components/d3/ScatterChart';
 
 const Dashboard = () => {
   const { token, playlistid } = useParams();
@@ -53,7 +50,7 @@ const Dashboard = () => {
   }, [token, playlistid]);
 
   useEffect(() => {
-    if (tracks) {
+    if (tracks && tracks.length > 0) {
       setLoadingMessage('Fetching track audio features');
       setLoading(true);
       fetchAudioFeatures();
@@ -61,7 +58,7 @@ const Dashboard = () => {
       setLoading(false);
     }
     async function fetchAudioFeatures() {
-      if (token && tracks) {
+      if (token && tracks && tracks.length > 0) {
         try {
           const features = (await fetchAudioFeaturesForTracks(
             tracks,
@@ -83,12 +80,10 @@ const Dashboard = () => {
       setLoading(false);
     }
     async function fetchAudioAnalysis() {
-      if (token && tracks) {
+      if (token && tracks && tracks.length > 0) {
         try {
           const analyses: AudioAnalysisAPIResponse[] =
             await fetchAudioAnalysisFortracks(tracks, token);
-          console.log('Analyses: ');
-          console.log(analyses);
           setAudioAnalysis(analyses);
         } catch (error) {
           console.error(JSON.stringify(error));
@@ -103,22 +98,18 @@ const Dashboard = () => {
     </div>
   ) : (
     <div>
-      <p>Loaded</p>
       <p>
-        {tracks?.length} {analysisResponses?.body.successes}{' '}
-        {analysisResponses?.body.failures}
-        {analysisResponses?.body.lyricFailures}
+        Number of tracks:{tracks?.length}
+        Successes: {analysisResponses?.body.successes}
+        Failures: {analysisResponses?.body.failures}
+        Lyric Failures: {analysisResponses?.body.lyricFailures}
       </p>
-      <p>{tracks ? getTrackName(tracks[0].track) : 'Nada'}</p>
-      <p>{tracks ? tracks[0].track.artists[0].name : 'Nada'}</p>
       <div>
         {analysisResponses ? (
-          <WordCloud
-            data={getWordCloudArray(analysisResponses)}
-            fontSize={(word) => Math.log2(word.value) * 5}
-            padding={1}
-            spiral={'archimedean'}
-          />
+          <div>
+            <SliderWordCloud data={analysisResponses} />
+            <ScatterChart analyses={analysisResponses.body.responses} />
+          </div>
         ) : (
           <p>No analysis data defined</p>
         )}
@@ -138,7 +129,7 @@ const Dashboard = () => {
       <div>
         {audioAnalysis && audioAnalysis.length > 0 ? (
           <div>
-            <p>{audioAnalysis[0].bars[0].start}</p>
+            <p>Bars: {audioAnalysis[0].bars[0].start}</p>
           </div>
         ) : (
           <div>
@@ -150,39 +141,6 @@ const Dashboard = () => {
   );
 };
 
-const getScatterPlotArray = (obj: NLTKResponse): ScatterPlotData[] => {
-  const data: ScatterPlotData[] = [];
-  const responses = obj.body.responses;
-  responses.forEach((response) => {
-    const positive = response.analysis.body.sentiment.positive;
-    const negative = response.analysis.body.sentiment.negative;
-    data.push({
-      positive: positive,
-      negative: negative,
-    });
-  });
-  return data;
-};
-
-const getWordCloudArray = (obj: NLTKResponse): WordCloudDataPoint[] => {
-  const responses = obj.body.responses;
-  const data: WordCloudDataPoint[] = [];
-  responses.forEach((response) => {
-    const frequencies = response.analysis.body.frequencies;
-    const keys = Object.keys(frequencies);
-    const vals = Object.values(frequencies) as number[];
-    keys.forEach((key, i) => {
-      const dataPoint: WordCloudDataPoint = { text: key, value: vals[i] };
-      data.push(dataPoint);
-    });
-  });
-  return data;
-};
-
-const getTrackName = (track: Track) => {
-  return track.name;
-};
-
 const fetchAudioAnalysisFortracks = async (
   tracks: Tracks[],
   token: string
@@ -191,7 +149,6 @@ const fetchAudioAnalysisFortracks = async (
     const promises: Promise<Response>[] = [];
     const responses: AudioAnalysisAPIResponse[] = [];
     for (const track of tracks) {
-      console.log(`checking track ${track.track.name}`);
       try {
         const response = fetch(
           `https://api.spotify.com/v1/audio-analysis/${track.track.id}`,
@@ -213,11 +170,8 @@ const fetchAudioAnalysisFortracks = async (
       }
     }
     Promise.allSettled(promises).then(async (results) => {
-      console.log('checking analysis promises');
       for (const result of results) {
-        console.log('Checking promise');
         if (result.status === 'fulfilled') {
-          console.log('Promise fulfilled');
           const response =
             (await result.value.json()) as AudioAnalysisAPIResponse;
           responses.push(response);
@@ -237,24 +191,23 @@ const fetchAudioFeaturesForTracks = async (
   return new Promise<AudioFeatures[]>(async (resolve, reject) => {
     const endpoint = 'https://api.spotify.com/v1/audio-features?';
     const trackIds: string[] = [];
-    for (let i = 0; i < tracks.length - 1; i++) {
+    for (let i = 0; i < tracks.length; i++) {
       trackIds.push(tracks[i].track.id);
     }
     try {
-      const response = await fetch(
+      const spotify_endpoint =
         endpoint +
-          new URLSearchParams({
-            ids: trackIds.join(','),
-          }),
-        {
-          method: 'GET',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-            Authorization: 'Bearer ' + token,
-          },
-        }
-      );
+        new URLSearchParams({
+          ids: trackIds.join(','),
+        });
+      const response = await fetch(spotify_endpoint, {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + token,
+        },
+      });
       if (response.ok) {
         const audioFeatureResponseObj =
           (await response.json()) as AudioFeaturesAPIResponse;
