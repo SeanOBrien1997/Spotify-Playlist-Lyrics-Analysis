@@ -8,6 +8,7 @@ import AudioFeaturesAPIResponse from '../model/spotify/AudioFeaturesAPIResponse'
 import PlaylistTracksAPIResponse from '../model/spotify/PlaylistTracksAPIResponse';
 import SliderWordCloud from '../components/d3/SliderWordCloud';
 import ScatterChart from '../components/d3/ScatterChart';
+import RadarChart from '../components/d3/RadarChart';
 
 const Dashboard = () => {
   const { token, playlistid } = useParams();
@@ -120,8 +121,9 @@ const Dashboard = () => {
       <div>
         {analysisResponses ? (
           <div>
-            <SliderWordCloud data={analysisResponses} />
             <ScatterChart analyses={analysisResponses.body.responses} />
+
+            <SliderWordCloud data={analysisResponses} />
           </div>
         ) : (
           <p>No analysis data defined</p>
@@ -130,8 +132,7 @@ const Dashboard = () => {
       <div>
         {audioFeatures && audioFeatures.length > 0 ? (
           <div>
-            <p>Audio features found</p>
-            <p>Energy: {audioFeatures[0].energy}</p>
+            <RadarChart features={audioFeatures} />
           </div>
         ) : (
           <div>

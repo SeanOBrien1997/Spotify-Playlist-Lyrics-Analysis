@@ -21,7 +21,7 @@ const ScatterChart = (props: ScatterChartProps) => {
 const getData = (analyses: AnalysisResponse[]) => {
   const dataSet: { x: number; y: number }[] = [];
   const data = {
-    labels: ['Scatter'],
+    labels: ['Positive', 'Negative'],
     datasets: [
       {
         label: 'Sentiment Analysis Dataset',
