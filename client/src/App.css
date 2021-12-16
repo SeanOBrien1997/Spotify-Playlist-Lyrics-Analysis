@@ -143,3 +143,11 @@ ul {
 .Slider-Container {
   display: inline-block;
 }
+
+.PlaylistImages{
+  width: 7em;
+  border-radius: 50%;
+}
+.playlist{
+  size: 10px;
+}

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+
 interface PlaylistProps {
   token: string;
 }
@@ -24,6 +25,7 @@ interface Playlist {
   href: string;
   id: string;
   images: Image[];
+  
   name: string;
   owner: {
     display_name: string;
@@ -93,7 +95,7 @@ const Playlists = (props: PlaylistProps) => {
               <div>
                 <dl>
                   <dt>
-                    <img src={playlist.images[0].url} alt='Playlist art' />
+                    <img src={playlist.images[0].url} alt='Playlist art' className ='PlaylistImages' />
                     <p>Owner: {playlist.owner.display_name}</p>
                     <p>
                       <a
