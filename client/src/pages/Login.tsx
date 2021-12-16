@@ -7,7 +7,6 @@ export default function Login() {
     <div>
       <header className='App-header'>
         <img src={logo} className='App-logo' alt='logo' />
-        
         <LoginForm></LoginForm>
       </header>
     </div>

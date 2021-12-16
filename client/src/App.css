@@ -48,7 +48,7 @@
 }
 
 .Button{
-  background-color: #282c34; /* Green */
+  background-color: #282c34; 
   border-radius: 4px;
   padding: 10px;
   width: 100px;
@@ -84,23 +84,6 @@ ul{
  max-width: 10px;
 
 }
-
-/* .LoginButton{
-  width: 100%;
-  padding: 20px;
-  background-color: #282c34;
-  border-color: white;
-  color: white;
-
-}
-.LoginButton:hover::before {
-  transform: rotate(-45deg);
-  background-color: rgba(255,255,255,0);
-}
-.LoginButton:hover::after {
-  transform: rotate(45deg);
-  background-color: rgba(255,255,255,0);
-} */
 
 .LoginButton {
   background-color: #282c34;
