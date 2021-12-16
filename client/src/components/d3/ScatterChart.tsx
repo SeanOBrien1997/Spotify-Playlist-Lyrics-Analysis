@@ -1,4 +1,4 @@
-import { Chart, ChartData, registerables } from 'chart.js';
+import { Chart, registerables } from 'chart.js';
 import React from 'react';
 import { Scatter } from 'react-chartjs-2';
 import AnalysisResponse from '../../model/nltk/AnalysisResponse';

@@ -1,7 +1,6 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import Playlists from '../components/playlists/Playlists';
-import Card from '../components/user/Card';
 
 const User = () => {
   const { token } = useParams();

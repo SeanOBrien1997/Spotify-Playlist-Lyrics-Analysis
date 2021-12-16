@@ -22,7 +22,6 @@ const Dashboard = () => {
 
   useEffect(() => {
     setLoadingMessage('Loading tracks');
-    setLoading(true);
     async function fetchTracks() {
       if (token && playlistid) {
         const tracks = await fetchPlaylistTrackIDs(token, playlistid);
@@ -43,19 +42,34 @@ const Dashboard = () => {
         } catch (error) {
           console.error(error);
         }
-        setLoading(false);
       }
     }
     fetchTracks();
   }, [token, playlistid]);
 
   useEffect(() => {
+    if (
+      audioAnalysis &&
+      audioAnalysis.length > 0 &&
+      audioFeatures &&
+      audioFeatures.length > 0 &&
+      analysisResponses &&
+      analysisResponses.body.responses.length > 0 &&
+      tracks &&
+      tracks.length > 0
+    ) {
+      setLoading(false);
+    } else {
+      setLoadingMessage('Loading Data');
+      setLoading(true);
+    }
+  }, [audioFeatures, audioAnalysis, analysisResponses, tracks]);
+
+  useEffect(() => {
     if (tracks && tracks.length > 0) {
       setLoadingMessage('Fetching track audio features');
-      setLoading(true);
       fetchAudioFeatures();
       setLoadingMessage('Fetching track audio analysis');
-      setLoading(false);
     }
     async function fetchAudioFeatures() {
       if (token && tracks && tracks.length > 0) {
@@ -70,14 +84,12 @@ const Dashboard = () => {
         }
       }
     }
-  }, [tracks]);
+  }, [tracks, token]);
 
   useEffect(() => {
     if (tracks && tracks.length > 0) {
-      setLoading(true);
       setLoadingMessage('Fetching track audio analysis');
       fetchAudioAnalysis();
-      setLoading(false);
     }
     async function fetchAudioAnalysis() {
       if (token && tracks && tracks.length > 0) {
@@ -90,7 +102,7 @@ const Dashboard = () => {
         }
       }
     }
-  }, [tracks]);
+  }, [tracks, token]);
 
   return loading ? (
     <div>

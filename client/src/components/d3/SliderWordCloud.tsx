@@ -17,10 +17,10 @@ const SliderWordCloud = (props: WordCloudProps) => {
   const [max, SetMax] = useState<number>(
     calculateMaxPossibleFrequency(props.data)
   );
-  const [minPossible, _SetMinPossible] = useState<number>(
+  const [minPossible] = useState<number>(
     calculateMinPossibleFrequency(props.data)
   );
-  const [maxPossible, _SetMaxPossible] = useState<number>(
+  const [maxPossible] = useState<number>(
     calculateMaxPossibleFrequency(props.data)
   );
   const [active, SetActive] = useState<WordCloudDataPoint[]>(
@@ -35,7 +35,7 @@ const SliderWordCloud = (props: WordCloudProps) => {
       });
       SetActive(filtered);
     }
-  }, [min, max]);
+  }, [min, max, props.data]);
 
   return (
     <div>
