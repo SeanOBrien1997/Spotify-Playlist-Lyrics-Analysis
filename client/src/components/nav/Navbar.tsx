@@ -4,11 +4,20 @@ import '../../App.css';
 
 const Navbar = () => {
   return (
-    <div>
-      <ul>
-        <Link to={'/'}>
-          <li>Home</li>
-        </Link>
+    <div className='Navbar'>
+      <div className='Heading'>Spotify Lyric Playlist Analyzer</div>
+      <ul className='ul'>
+        <li>
+          <Link to={'/'}>
+            <button className='Button'> Home </button>
+          </Link>
+        </li>
+
+        <li>
+          <Link to={'/About'}>
+            <button className='AboutButton'> About </button>
+          </Link>
+        </li>
       </ul>
     </div>
   );

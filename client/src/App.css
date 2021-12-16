@@ -5,6 +5,7 @@
 .App-logo {
   height: 40vmin;
   pointer-events: none;
+  margin-top: 150px;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -36,3 +37,121 @@
     transform: rotate(360deg);
   }
 }
+.Navbar {
+  overflow: hidden;
+  background-color: #1Db954;
+  height: 8em;
+  margin-top: -2em;
+  margin-bottom: -.8em;
+  
+  
+}
+
+.Button{
+  background-color: #282c34; 
+  border-radius: 4px;
+  padding: 10px;
+  width: 100px;
+  text-decoration: none;
+  font-size: 16px;
+  margin: 2px;
+  cursor: pointer;
+  color: white;
+  
+  
+  
+  
+}
+.AboutButton{
+  background-color: #282c34; /* Green */
+  border-radius: 4px;
+  padding: 10px;
+  width: 100px;
+  text-decoration: none;
+  font-size: 16px;
+  margin: 2px;
+  cursor: pointer;
+  color: white;
+  
+}
+ul, li {
+  display:inline
+  
+}
+
+ul{
+  margin-left: -1400px;
+ max-width: 10px;
+
+}
+
+.LoginButton {
+  background-color: #282c34;
+  color: white;
+  transition: all 0.5s;
+  position: relative; 
+  height: 50px;
+  width: 300px;
+  margin-bottom: 500px;
+  cursor: pointer;
+}
+.LoginButton span {
+  z-index: 2; 
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 100%; 
+ 
+}
+.LoginButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  transition: all 0.5s;
+  border: 1px solid rgba(255,255,255,0.2);
+  /* border: 1px solid #282c34; */
+  background-color: rgba(255,255,255,0.1);
+  color: white;
+  
+}
+.LoginButton::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  transition: all 0.5s;
+
+  
+  border: 1px solid rgba(255,255,255,0.2);
+  background-color: rgba(255,255,255,0.1);
+  color: white;
+  
+  
+}
+.LoginButton:hover::before {
+  transform: rotate(-45deg);
+  background-color: rgba(255,255,255,0);
+  color: white;
+ 
+}
+.LoginButton:hover::after {
+  transform: rotate(45deg);
+  background-color: rgba(255,255,255,0);
+  color: white;
+}
+.Heading{
+  color: white;
+  font-size: 200%;
+  text-align: center;
+  margin-top: 1.5em;
+height: .1em;}
+
+
+

@@ -8,7 +8,7 @@ export default function LoginForm() {
     <div className='App'>
       <header className='App-header'>
         <a href={URL} className='btn-spotify'>
-          Login with Spotify
+          <button className='LoginButton'> Login with Spotify </button>
         </a>
       </header>
     </div>
