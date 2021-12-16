@@ -41,9 +41,11 @@ const SliderWordCloud = (props: WordCloudProps) => {
     <div>
       <div className='Slider-Container'>
         <p>
+          Filter token occurences: <br />
           Current Min: {min}, Current Max: {max}
         </p>
         <Range
+          defaultValue={[minPossible, maxPossible]}
           min={minPossible}
           max={maxPossible}
           onAfterChange={(value) => {

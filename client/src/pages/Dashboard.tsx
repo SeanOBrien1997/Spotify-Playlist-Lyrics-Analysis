@@ -111,10 +111,11 @@ const Dashboard = () => {
   ) : (
     <div>
       <p>
-        Number of tracks:{tracks?.length}
-        Successes: {analysisResponses?.body.successes}
-        Failures: {analysisResponses?.body.failures}
-        Lyric Failures: {analysisResponses?.body.lyricFailures}
+        Number of tracks Analysed:{tracks?.length} <br />
+        Successes: {analysisResponses?.body.successes} <br />
+        Analysis Failures: {analysisResponses?.body.failures} <br />
+        Failures due to lack of Lyric data:
+        {analysisResponses?.body.lyricFailures} <br />
       </p>
       <div>
         {analysisResponses ? (

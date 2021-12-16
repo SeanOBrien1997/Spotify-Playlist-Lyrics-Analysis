@@ -42,6 +42,7 @@ const GENIUS_CLIENT_ACCESS_TOKEN: string | undefined =
  */
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
+  lambdaRequest('warmup');
 });
 
 /**
@@ -107,15 +108,15 @@ app.get('/auth/callback', async (request, response) => {
       );
       if (spotify_token_response.status === 200) {
         const token = spotify_token_response.data.access_token;
-        console.log(token);
+        console.info(token);
         response.redirect(`http://localhost:9001/user/${token}`);
       } else {
-        console.log(
+        console.error(
           `Invalid status code received by Spotify API: ${spotify_token_response.status}`
         );
       }
     } catch (error) {
-      console.log(JSON.stringify(error));
+      console.error(JSON.stringify(error));
     }
   } else {
     console.error(`Code or state was not defined for callback:
@@ -130,7 +131,6 @@ app.get('/auth/callback', async (request, response) => {
 app.get('/auth/token', (request, response) => {});
 
 app.post('/nltk/stats', async (request, response) => {
-  console.log(request.body);
   const tracks = request.body.tracks as Tracks[];
   const trackLyrics = new Map<Tracks, string>();
   let successes = 0;
@@ -139,7 +139,9 @@ app.post('/nltk/stats', async (request, response) => {
   for (const track of tracks) {
     const trackName = track.track.name;
     const trackArtists = track.track.artists;
-    console.log(`${trackName} by ${trackArtists[0].name}`);
+    console.log(
+      `Fetching lyric data for ${trackName} by ${trackArtists[0].name}`
+    );
     const geniusOptions = {
       apiKey: GENIUS_CLIENT_ACCESS_TOKEN,
       title: trackName,
@@ -172,21 +174,12 @@ app.post('/nltk/stats', async (request, response) => {
       failures++;
     }
   }
-
-  console.log('Total tracks polled for ' + tracks.length);
-  console.log(
-    `successes: ${successes} failures: ${failures} lyric fails: ${lyricFailures}`
-  );
   const formattedResponse = [];
   for (const [track, response] of lambdaResponses) {
-    console.log(
-      track.track.name + ' by ' + track.track.artists[0].name + ' was analysed'
-    );
     formattedResponse.push({
       track: track.track,
       analysis: response,
     });
-    console.log(JSON.stringify(response));
   }
   response.status(200).json({
     body: {
@@ -226,7 +219,6 @@ const lambdaRequest = async (msg: string): Promise<Object> => {
       reject('Unexpected error when invoking the Lambda service.');
     }
   });
-  console.log('Sending request to: ' + LAMBDA_URL);
 };
 
 const Scopes = {
