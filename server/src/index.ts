@@ -41,8 +41,10 @@ const GENIUS_CLIENT_ACCESS_TOKEN: string | undefined =
  * Starts express server.
  */
 app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-  lambdaRequest('warmup');
+  serverWarmUp({
+    serverConsoleMessage: `Server running on port ${port}`,
+    lambdaWarmUpLyric: 'Warmup',
+  });
 });
 
 /**
@@ -190,6 +192,19 @@ app.post('/nltk/stats', async (request, response) => {
     },
   });
 });
+
+/**
+ * Ran on start up of express server.
+ * @param warmUpData Contains console message that will be logged on start up and the lyric data to warm up the Lambda container.
+ * @returns The Lambda response promise.
+ */
+const serverWarmUp = (warmUpData: {
+  serverConsoleMessage: string;
+  lambdaWarmUpLyric: string;
+}): Promise<Object> => {
+  console.log(warmUpData.serverConsoleMessage);
+  return lambdaRequest(warmUpData.lambdaWarmUpLyric);
+};
 
 const randomString = (length: number): string => {
   let text: string = '';
