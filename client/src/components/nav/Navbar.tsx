@@ -12,12 +12,6 @@ const Navbar = () => {
             <button className='Button'> Home </button>
           </Link>
         </li>
-
-        <li>
-          <Link to={'/About'}>
-            <button className='AboutButton'> About </button>
-          </Link>
-        </li>
       </ul>
     </div>
   );

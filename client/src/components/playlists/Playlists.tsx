@@ -90,18 +90,20 @@ const Playlists = (props: PlaylistProps) => {
       <h3>You have {playlistsResponse?.total} playlist(s):</h3>
       <div>
         <form onSubmit={formSubmit}>
+          <div>
           {playlistsResponse?.items.map(function (playlist, index) {
             return (
-              <div>
+              <div className="Playlists">
                 <dl>
                   <dt>
                     <img src={playlist.images[0].url} alt='Playlist art' className ='PlaylistImages' />
-                    <p>Owner: {playlist.owner.display_name}</p>
+                    <p>{playlist.owner.display_name}</p>
                     <p>
-                      <a
+                      <a className="button"
                         href={playlist.external_urls.spotify}
                         target='_blank'
                         rel='noopener noreferrer'
+                       
                       >
                         {playlist.name}
                       </a>
@@ -119,7 +121,8 @@ const Playlists = (props: PlaylistProps) => {
               </div>
             );
           })}
-          <button type='submit'>Submit</button>
+          <button className="Pbutton" type='submit' >Submit Playlist </button>
+          </div>
         </form>
       </div>
     </div>

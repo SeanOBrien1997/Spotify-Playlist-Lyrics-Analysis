@@ -10,6 +10,7 @@ import SliderWordCloud from '../components/d3/SliderWordCloud';
 import ScatterChart from '../components/d3/ScatterChart';
 import RadarChart from '../components/d3/RadarChart';
 
+
 const Dashboard = () => {
   const { token, playlistid } = useParams();
 
@@ -106,10 +107,12 @@ const Dashboard = () => {
   }, [tracks, token]);
 
   return loading ? (
+    
     <div>
       <p>{loadingMessage}...</p>
     </div>
   ) : (
+    
     <div>
       <p>
         Number of tracks Analysed:{tracks?.length} <br />
@@ -121,9 +124,13 @@ const Dashboard = () => {
       <div>
         {analysisResponses ? (
           <div>
+            <div className="ScatterChart">
             <ScatterChart analyses={analysisResponses.body.responses} />
+            </div>
 
+              <div className = " WordCloud">
             <SliderWordCloud data={analysisResponses} />
+            </div>
           </div>
         ) : (
           <p>No analysis data defined</p>
@@ -131,7 +138,7 @@ const Dashboard = () => {
       </div>
       <div>
         {audioFeatures && audioFeatures.length > 0 ? (
-          <div>
+          <div className = "RadarGraph">
             <RadarChart features={audioFeatures} />
           </div>
         ) : (
@@ -151,7 +158,7 @@ const Dashboard = () => {
           </div>
         )}
       </div>
-    </div>
+    </div>  
   );
 };
 
@@ -265,8 +272,10 @@ const fetchPlaylistTrackIDs = async (
     } catch (error) {
       console.error(JSON.stringify(error));
       reject('Unexpected error whilst fetching track information');
+
     }
   });
 };
+
 
 export default Dashboard;

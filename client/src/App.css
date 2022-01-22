@@ -78,6 +78,7 @@ ul {
 }
 
 .LoginButton {
+  margin-top: -100px;
   background-color: #282c34;
   color: white;
   transition: all 0.5s;
@@ -151,3 +152,107 @@ ul {
 .playlist{
   size: 10px;
 }
+.RadarGraph{
+  width: 30em;
+  position: absolute;
+right: 15%;
+top: 15%;
+}
+
+.WordCloud{
+width: 60em;
+position: absolute;
+left: -7em;
+
+
+}
+
+.ScatterChart{
+width: 40em;
+
+}
+
+.Playlists{
+  margin-right: 5px;
+  margin-bottom: 5px;
+  border-style: solid;
+  float: left;
+  border-radius: 15%;
+ background-color: white;
+ color: black;
+ border-color: white;
+  width: 10em;
+  
+}
+
+.button{
+  margin: auto;
+  text-decoration: none;
+  font-size: 20px;
+    white-space: normal;
+    display: block;
+    width: 200px;
+    height: 25px;
+    background: #4E9CAF;
+    padding: 10px;
+    text-align: center;
+    border-radius: 5px;
+    color: white;
+    font-weight: bold;
+    line-height: 25px;
+}
+
+.Pbutton{
+  top: 10em;
+  text-decoration: none;  
+  padding: 0.8em 1.8em;
+ border: 2px solid #17C3B2;
+ position: relative;
+ overflow: hidden;
+ background-color: transparent;
+ text-align: center;
+ text-transform: uppercase;
+ font-size: 16px;
+ transition: .3s;
+ z-index: 1;
+ font-family: inherit;
+ color: #17C3B2;
+}
+.Pbutton::before {
+  content: '';
+  width: 0;
+  height: 300%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(45deg);
+  background: #17C3B2;
+  transition: .5s ease;
+  display: block;
+  z-index: -1;
+ }
+ .Pbutton:hover::before {
+   width: 105%;
+  }
+  
+  .Pbutton:hover {
+   color: #111;
+  }
+
+  .Paragraph{
+    width: 40em;
+    position: absolute ;
+  margin-bottom: -30%;
+  }
+
+  .DashboardP{
+
+  background-color: #282c34 ;
+  }
+  
+ 
+
+  
+
+ 
+ 
