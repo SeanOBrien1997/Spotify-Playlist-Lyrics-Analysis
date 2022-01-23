@@ -9,6 +9,7 @@ import PlaylistTracksAPIResponse from '../model/spotify/PlaylistTracksAPIRespons
 import SliderWordCloud from '../components/d3/SliderWordCloud';
 import ScatterChart from '../components/d3/ScatterChart';
 import RadarChart from '../components/d3/RadarChart';
+import BarChart from '../components/d3/BarChart';
 
 
 const Dashboard = () => {
@@ -105,7 +106,11 @@ const Dashboard = () => {
       }
     }
   }, [tracks, token]);
-
+  const barProps = {
+    successes : analysisResponses?.body.successes,
+    failures : analysisResponses?.body.failures,
+    lyricFailures : analysisResponses?.body.lyricFailures,
+  }
   return loading ? (
     
     <div>
